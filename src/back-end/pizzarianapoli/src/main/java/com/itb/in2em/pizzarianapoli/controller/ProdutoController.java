@@ -2,6 +2,7 @@ package com.itb.in2em.pizzarianapoli.controller;
 
 import java.util.List;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -52,31 +53,70 @@ public class ProdutoController {
   
   // Buscar produto pelo Id
 
+  // Utilize "?" ou "Object" quando o retorno pode ser objetos diferentes
+
   @GetMapping("/{id}")
-  public Produto findById(@PathVariable Long id) {
-    return produtoService.buscarPorId(id);
+  public ResponseEntity<?> findById(@PathVariable String id) {
+     try {
+      Long idLong = Long.parseLong(id);
+      Produto produto = produtoService.buscarPorId(idLong);
+      if(produto == null) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Produto como o id " + id + " não encontrado.");
+      }
+        return ResponseEntity.ok(produto);
+     } catch (Exception e) {
+         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body( id + " inválido, utilize um valor numérico.");
+     }
+    
   }
 
   // Salvar Produto
 
   @PostMapping
-  public Produto save(@RequestBody Produto produto) {
-    return produtoService.salvar(produto);
+  public ResponseEntity<Produto> save(@RequestBody Produto produto) {
+    return ResponseEntity.status(HttpStatus.CREATED).body(produtoService.salvar(produto));
   }
 
   // Atualizar todos os dados do Produto
 
   @PutMapping("/{id}")
-  public Produto update (@PathVariable Long id, @RequestBody Produto produto) {
+  public ResponseEntity<?> update (@PathVariable String id, @RequestBody Produto produto) {
 
-    return produtoService.atualizar(id, produto);
+   try {
+      Long idLong = Long.parseLong(id);
+      Produto produtoBanco = produtoService.buscarPorId(idLong);
+      if(produtoBanco == null) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Produto como o id " + id + " não encontrado.");
+      }
+    
+      Produto produtoAtualizado = produtoService.atualizar(idLong, produto);
+      return ResponseEntity.ok(produtoAtualizado);
+   } catch (Exception e) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body( id + " inválido, utilize um valor numérico.");
+   }
 
   }
   // Excluir Produto
 
   @DeleteMapping("/{id}")
-  public boolean delete(@PathVariable Long id) {
-    return produtoService.excluir(id);
+  public ResponseEntity<?> delete(@PathVariable String id) {
+   try {
+
+       Long idLong = Long.parseLong(id);
+       Produto produtoBanco = produtoService.buscarPorId(idLong);
+       if(produtoBanco == null) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Produto como o id " + id + " não encontrado.");
+      }
+      boolean excluido = produtoService.excluir(idLong);
+      if (excluido) {
+        return ResponseEntity.ok("Produto com o id " + id + " excluído com sucesso.");
+      } else {
+        return ResponseEntity.ok("Não foi possível excluir o produto com o id " + id);
+      }
+       
+     } catch (Exception e) {
+       return ResponseEntity.status(HttpStatus.BAD_REQUEST).body( id + " inválido, utilize um valor numérico.");
+    }
   }
 
 

@@ -14,10 +14,22 @@ GET  http://localhost:8080/api/v1/produtos
 
 ### Listar produto por ID
 
-GET http://localhost:8080/api/v1/produtos/1
+GET http://localhost:8080/api/v1/produtos/1000
 
 ### Excluir produto por ID
 
-DELETE http://localhost:8080/api/v1/produtos/3
+DELETE http://localhost:8080/api/v1/produtos/1
+
+
+### Atualizar produto
+PUT  http://localhost:8080/api/v1/produtos/1
+Content-Type: application/json
+
+{
+    "nome": "Pizza Maluca",
+    "descricao": "Pizza maluca com tudo que tem direito",
+    "valorVenda": 200.90,
+    "codStatus": true  
+}
 
 
